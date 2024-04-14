@@ -10,7 +10,13 @@ import {
   CreateAccount,
   CreateAccountTitle,
 } from './styles'
-import { ScrollView, KeyboardAvoidingView, Platform, View } from 'react-native'
+import {
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  View,
+  Alert,
+} from 'react-native'
 import { Button } from '../../components/Form/Button'
 import logo from '../../assets/logo.png'
 import { useNavigation } from '@react-navigation/native'
@@ -18,7 +24,7 @@ import { useForm, FieldValues, Resolver } from 'react-hook-form'
 import { InputControl } from '../../components/Form/InputControl'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
-import { AuthContext } from '../../context/AuthContext'
+import { useAuth, ICredentials } from '../../context/AuthContext'
 
 interface ScreenNavigationProp {
   navigate: (screen: string) => void
@@ -34,7 +40,8 @@ const formSchema = yup.object({
 })
 
 export const SignIn: React.FunctionComponent = () => {
-  const auth = React.useContext(AuthContext)
+  const [loading, setLoading] = React.useState(false)
+  const auth = useAuth()
   const {
     control,
     handleSubmit,
@@ -48,9 +55,19 @@ export const SignIn: React.FunctionComponent = () => {
     const data = {
       email: form.email,
       password: form.password,
-    }
+    } as ICredentials
 
-    console.log(data)
+    setLoading(true)
+    try {
+      auth.signIn(data)
+      setLoading(false)
+    } catch {
+      Alert.alert(
+        'Erro na autenticação',
+        'Ocorreu um erro fazer o login, verifique as credenciais.',
+      )
+      setLoading(false)
+    }
   }
 
   return (
@@ -87,7 +104,11 @@ export const SignIn: React.FunctionComponent = () => {
               placeholder="Senha"
               secureTextEntry
             />
-            <Button title="Entrar" onPress={handleSubmit(handleSignIn)} />
+            <Button
+              title="Entrar"
+              onPress={handleSubmit(handleSignIn)}
+              disabled={loading || !!errors.email || !!errors.password}
+            />
             <ForgotPasswordButton>
               <ForgotPasswordTitle>Esqueci minha senha</ForgotPasswordTitle>
             </ForgotPasswordButton>
