@@ -53,6 +53,8 @@ const Icon = styled(Feather)`
   color: ${({ theme }: DefaultTheme) => theme.colors.dark};
 `
 
+const LogoutButton = styled.TouchableOpacity``
+
 export {
   Container,
   Header,
@@ -64,4 +66,5 @@ export {
   UserName,
   UserAvatar,
   Icon,
+  LogoutButton,
 }

@@ -11,13 +11,28 @@ import {
   UserName,
   UserAvatar,
   Icon,
+  LogoutButton,
 } from './styles'
 
 import avatarDefault from '../../assets/avatar02.png'
 import { useAuth } from '../../context/AuthContext'
+import { Alert } from 'react-native'
 
 export const Home: React.FunctionComponent = () => {
-  const { user } = useAuth()
+  const { user, signOut } = useAuth()
+
+  const handleLogout = () => {
+    Alert.alert('Tem certeza?', 'Deseja realmente fazer seu logout ?', [
+      {
+        text: 'Cancelar',
+        onPress: () => {},
+      },
+      {
+        text: 'Sair',
+        onPress: () => signOut(),
+      },
+    ])
+  }
 
   return (
     <Container>
@@ -36,7 +51,9 @@ export const Home: React.FunctionComponent = () => {
               <UserName>{user.name}</UserName>
             </UserInfoDetail>
           </UserInfo>
-          <Icon name="power" />
+          <LogoutButton onPress={handleLogout}>
+            <Icon name="power" />
+          </LogoutButton>
         </UserWrapper>
       </Header>
     </Container>

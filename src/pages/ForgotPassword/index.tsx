@@ -33,12 +33,10 @@ interface IFormInputs {
 }
 
 const formSchema = yup.object({
-  name: yup.string().required('Informe seu nome completo.'),
   email: yup.string().email('E-mail inválido.').required('Informe o e-mail.'),
-  password: yup.string().required('Informe a senha.'),
 })
 
-export const SignUp: React.FunctionComponent = () => {
+export const ForgotPassword: React.FunctionComponent = () => {
   const {
     control,
     handleSubmit,
@@ -48,25 +46,26 @@ export const SignUp: React.FunctionComponent = () => {
   })
   const { navigate } = useNavigation<ScreenNavigationProp>()
 
-  const handleSignUp = async (form: IFormInputs) => {
+  const handleForgotPassword = async (form: IFormInputs) => {
     const data = {
-      name: form.name,
       email: form.email,
-      password: form.password,
     }
 
     try {
-      await api.post('/users', data)
-      Alert.alert('Cadastro realizado', 'Você ja pode fazer seu login.')
+      await api.post('/password/forgot', data)
+      Alert.alert(
+        'E-mail enviado',
+        'Você receberá um e-mail com as instruções para redefinir sua senha',
+      )
+      navigate('ResetPassword')
     } catch {
       Alert.alert(
-        'Erro no cadastro',
-        'Ocorreu um erro ao realizar o cadastro, tente novamente.',
+        'Erro no envio',
+        'Ocorreu um erro ao enviar o e-mail, tente novamente.',
       )
     }
   }
 
-  console.log(process.env.EXPO_PUBLIC_API_URL)
   return (
     <KeyboardAvoidingView
       enabled
@@ -81,14 +80,9 @@ export const SignUp: React.FunctionComponent = () => {
           <Content>
             <Logo source={logo} />
             <View>
-              <Title>Crie sua conta</Title>
+              <Title>Digite sua senha</Title>
             </View>
-            <InputControl
-              error={errors.name && (errors.name.message as string)}
-              control={control}
-              name="name"
-              placeholder="Nome completo"
-            />
+
             <InputControl
               error={errors.email && (errors.email.message as string)}
               autoCapitalize="none"
@@ -98,16 +92,11 @@ export const SignUp: React.FunctionComponent = () => {
               name="email"
               placeholder="E-mail"
             />
-            <InputControl
-              error={errors.password && (errors.password.message as string)}
-              autoCapitalize="none"
-              autoCorrect={false}
-              control={control}
-              name="password"
-              placeholder="Senha"
-              secureTextEntry
+
+            <Button
+              title="Enviar e-mail"
+              onPress={handleSubmit(handleForgotPassword)}
             />
-            <Button title="Criar conta" onPress={handleSubmit(handleSignUp)} />
           </Content>
         </Container>
       </ScrollView>

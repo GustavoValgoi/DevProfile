@@ -33,12 +33,14 @@ interface IFormInputs {
 }
 
 const formSchema = yup.object({
-  name: yup.string().required('Informe seu nome completo.'),
-  email: yup.string().email('E-mail inválido.').required('Informe o e-mail.'),
-  password: yup.string().required('Informe a senha.'),
+  token: yup.string().uuid('Código inválido').required('Informe o código.'),
+  password: yup.string().required('Informe a nova senha.'),
+  password_confirmation: yup
+    .string()
+    .oneOf([yup.ref('password')], 'Confimação incorreta.'),
 })
 
-export const SignUp: React.FunctionComponent = () => {
+export const ResetPassword: React.FunctionComponent = () => {
   const {
     control,
     handleSubmit,
@@ -48,25 +50,25 @@ export const SignUp: React.FunctionComponent = () => {
   })
   const { navigate } = useNavigation<ScreenNavigationProp>()
 
-  const handleSignUp = async (form: IFormInputs) => {
+  const handleResetPassword = async (form: IFormInputs) => {
     const data = {
-      name: form.name,
-      email: form.email,
+      token: form.token,
       password: form.password,
+      password_confirmation: form.password_confirmation,
     }
 
     try {
-      await api.post('/users', data)
-      Alert.alert('Cadastro realizado', 'Você ja pode fazer seu login.')
+      await api.post('/password/reset', data)
+      Alert.alert('Senha redefinida', 'A senha foi alterada com sucesso.')
+      navigate('SignIn')
     } catch {
       Alert.alert(
-        'Erro no cadastro',
-        'Ocorreu um erro ao realizar o cadastro, tente novamente.',
+        'Ocorreu um problema',
+        'Ocorreu um erro ao tentar redefinir sua senha, tente novamente.',
       )
     }
   }
 
-  console.log(process.env.EXPO_PUBLIC_API_URL)
   return (
     <KeyboardAvoidingView
       enabled
@@ -81,22 +83,15 @@ export const SignUp: React.FunctionComponent = () => {
           <Content>
             <Logo source={logo} />
             <View>
-              <Title>Crie sua conta</Title>
+              <Title>Alterar a senha</Title>
             </View>
             <InputControl
-              error={errors.name && (errors.name.message as string)}
+              error={errors.token && (errors.token.message as string)}
               control={control}
-              name="name"
-              placeholder="Nome completo"
-            />
-            <InputControl
-              error={errors.email && (errors.email.message as string)}
-              autoCapitalize="none"
+              name="token"
+              placeholder="código"
               autoCorrect={false}
-              keyboardType="email-address"
-              control={control}
-              name="email"
-              placeholder="E-mail"
+              autoCapitalize="none"
             />
             <InputControl
               error={errors.password && (errors.password.message as string)}
@@ -107,7 +102,23 @@ export const SignUp: React.FunctionComponent = () => {
               placeholder="Senha"
               secureTextEntry
             />
-            <Button title="Criar conta" onPress={handleSubmit(handleSignUp)} />
+
+            <InputControl
+              error={
+                errors.password_confirmation &&
+                (errors.password_confirmation.message as string)
+              }
+              autoCapitalize="none"
+              autoCorrect={false}
+              control={control}
+              name="password_confirmation"
+              placeholder="Confirmação da Senha"
+              secureTextEntry
+            />
+            <Button
+              title="confirmar"
+              onPress={handleSubmit(handleResetPassword)}
+            />
           </Content>
         </Container>
       </ScrollView>
