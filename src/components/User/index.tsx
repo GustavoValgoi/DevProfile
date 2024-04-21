@@ -33,10 +33,10 @@ export const User: React.FunctionComponent<UserProps> = ({
           <EmailTitle>Name</EmailTitle>
           <EmailData>{data.email}</EmailData>
         </UserEmailDetail>
-        <UserAvatar
-          source={data.avatar_url ? { uri: data.avatar_url } : avatarDefault}
-        />
       </UserDetail>
+      <UserAvatar
+        source={data.avatar_url ? { uri: data.avatar_url } : avatarDefault}
+      />
     </Container>
   )
 }
